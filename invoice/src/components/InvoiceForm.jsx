@@ -15,6 +15,7 @@ function InvoiceForm() {
     currency: '₹',
     currentDate: '',
     invoiceNumber: 1,
+    shopName: '',
     dateOfIssue: '',
     billTo: '',
     billToEmail: '',
@@ -153,16 +154,31 @@ function InvoiceForm() {
                 </div>
               </div>
               <div className="d-flex flex-row align-items-center">
-                <span className="fw-bold me-2">Invoice&nbsp;Number:&nbsp;</span>
-                <Form.Control 
-                  type="number" 
-                  value={state.invoiceNumber} 
-                  name="invoiceNumber" 
-                  onChange={editField} 
-                  min="1" 
-                  style={{ maxWidth: '70px' }} 
-                  required 
-                />
+                <div className="d-flex flex-column">
+                  <div className="d-flex flex-row align-items-center mb-2">
+                    <span className="fw-bold me-2">Invoice&nbsp;Number:&nbsp;</span>
+                    <Form.Control 
+                      type="number" 
+                      value={state.invoiceNumber} 
+                      name="invoiceNumber" 
+                      onChange={editField} 
+                      min="1" 
+                      style={{ maxWidth: '70px' }} 
+                      required 
+                    />
+                  </div>
+                  <div className="d-flex flex-row align-items-center">
+                    <span className="fw-bold me-2">Shop&nbsp;Name:&nbsp;</span>
+                    <Form.Control 
+                      type="text" 
+                      value={state.shopName} 
+                      name="shopName" 
+                      onChange={editField} 
+                      placeholder="Shop Name" 
+                      style={{ maxWidth: '200px' }} 
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <hr className="my-4"/>
@@ -305,18 +321,13 @@ function InvoiceForm() {
             <Form.Group className="mb-3">
               <Form.Label className="fw-bold">Currency:</Form.Label>
               <Form.Select 
+                value={state.currency}
                 onChange={event => onCurrencyChange({currency: event.target.value})} 
                 className="btn btn-light my-1" 
                 aria-label="Change Currency"
+                disabled
               >
-                <option value="$">USD (United States Dollar)</option>
-                <option value="£">GBP (British Pound Sterling)</option>
-                <option value="¥">JPY (Japanese Yen)</option>
-                <option value="$">CAD (Canadian Dollar)</option>
-                <option value="$">AUD (Australian Dollar)</option>
-                <option value="$">SGD (Singapore Dollar)</option>
-                <option value="¥">CNY (Chinese Renminbi)</option>
-                <option value="₿">BTC (Bitcoin)</option>
+                <option value="₹">INR (Indian Rupees)</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="my-3">
