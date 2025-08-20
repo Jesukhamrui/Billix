@@ -48,6 +48,11 @@ function InvoiceModal({
               <h6 className="fw-bold text-secondary mb-1">
                 Invoice #: {info.invoiceNumber || ''}
               </h6>
+              {info.shopName && (
+                <h6 className="fw-bold text-primary mb-1">
+                  Shop Name: {info.shopName}
+                </h6>
+              )}
             </div>
             <div className="text-end ms-4">
               <h6 className="fw-bold mt-1 mb-2">Amount&nbsp;Due:</h6>
