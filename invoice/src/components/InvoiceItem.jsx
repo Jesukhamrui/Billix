@@ -23,16 +23,6 @@ function ItemRow({ item, onItemizedItemEdit, onDelEvent }) {
             id: item.id,
           }}
         />
-        <EditableField
-          onItemizedItemEdit={onItemizedItemEdit}
-          cellData={{
-            type: "text",
-            name: "description",
-            placeholder: "Item description",
-            value: item.description,
-            id: item.id
-          }}
-        />
       </td>
       <td style={{minWidth: '70px'}}>
         <EditableField
@@ -40,7 +30,7 @@ function ItemRow({ item, onItemizedItemEdit, onDelEvent }) {
           cellData={{
             type: "number",
             name: "quantity",
-            min: 1,
+            min: 0,
             step: "1",
             value: item.quantity,
             id: item.id,
@@ -74,7 +64,7 @@ function ItemRow({ item, onItemizedItemEdit, onDelEvent }) {
   )
 }
 
-function InvoiceItem({ items, onItemizedItemEdit, onRowAdd, onRowDel }) {
+function InvoiceItem({ items, onItemizedItemEdit, onRowAdd, onRowDel, currency }) {
   const itemTable = items.map((item) => (
     <ItemRow 
       key={item.id}
@@ -85,11 +75,12 @@ function InvoiceItem({ items, onItemizedItemEdit, onRowAdd, onRowDel }) {
   ))
 
   return (
-    <div>
-      <Table>
+    <div className="invoice-items">
+      <div className="table-responsive">
+        <Table>
         <thead>
           <tr>
-            <th>ITEM</th>
+              <th>ITEM</th>
             <th>QTY</th>
             <th>PRICE/RATE</th>
             <th className="text-center">ACTION</th>
@@ -98,8 +89,9 @@ function InvoiceItem({ items, onItemizedItemEdit, onRowAdd, onRowDel }) {
         <tbody>
           {itemTable}
         </tbody>
-      </Table>
-      <Button className="fw-bold" onClick={onRowAdd}>
+        </Table>
+      </div>
+      <Button className="add-item-button fw-bold" onClick={onRowAdd}>
         Add Item
       </Button>
     </div>

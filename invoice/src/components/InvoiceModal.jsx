@@ -5,11 +5,11 @@ import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table'
 import Modal from 'react-bootstrap/Modal'
-import { BiPaperPlane, BiCloudDownload } from "react-icons/bi"
+import { BiPaperPlane, BiCloudDownload, BiShareAlt, BiSave } from "react-icons/bi"
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 
-function GenerateInvoice() {
+function GenerateInvoice(info) {
   html2canvas(document.querySelector("#invoiceCapture")).then((canvas) => {
     const imgData = canvas.toDataURL('image/png', 1.0)
     const pdf = new jsPDF({
@@ -22,7 +22,8 @@ function GenerateInvoice() {
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
     pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-    pdf.save('invoice-001.pdf')
+    const fileName = `${(info.shopName || 'billix').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-invoice-${info.invoiceNumber || '0001'}.pdf`
+    pdf.save(fileName)
   })
 }
 
@@ -35,121 +36,118 @@ function InvoiceModal({
   subTotal, 
   taxAmmount, 
   discountAmmount, 
-  total 
+  total,
+  onSaveInvoice,
+  onShareInvoice
 }) {
   const formatINR = (value) => Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
   return (
     <div>
       <Modal show={showModal} onHide={closeModal} size="lg" centered>
-        <div id="invoiceCapture">
-          <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
-            <div className="w-100">
-              <h4 className="fw-bold my-2">{info.billFrom || 'John Uberbacher'}</h4>
-              <h6 className="fw-bold text-secondary mb-1">
-                Invoice #: {info.invoiceNumber || ''}
-              </h6>
-              {info.shopName && (
-                <h6 className="fw-bold text-primary mb-1">
-                  Shop Name: {info.shopName}
-                </h6>
-              )}
-            </div>
-            <div className="text-end ms-4">
-              <h6 className="fw-bold mt-1 mb-2">Amount&nbsp;Due:</h6>
-              <h5 className="fw-bold text-secondary">{formatINR(total)}</h5>
+        <div id="invoiceCapture" className={`invoice-pdf ${info.template === 'clean' ? 'invoice-pdf-clean' : ''}`}>
+          <div className="invoice-pdf-header">
+            <div className="invoice-pdf-header-wave" />
+            <div className="invoice-pdf-header-content">
+              {info.logo && <img className="invoice-pdf-logo" src={info.logo} alt="Invoice logo" />}
+              <div className="invoice-pdf-title">INVOICE</div>
+              <div className="invoice-pdf-header-shop-name">{info.shopName || 'Billix'}</div>
+              <div className="invoice-pdf-number">NO: INV-{info.invoiceNumber || '0001'}</div>
             </div>
           </div>
-          <div className="p-4">
-            <Row className="mb-4">
-              <Col md={4}>
-                <div className="fw-bold">Billed to:</div>
+          <div className="invoice-pdf-body">
+            <Row className="invoice-pdf-parties">
+              <Col md={6}>
+                <div className="invoice-pdf-section-title">Bill To:</div>
                 <div>{info.billTo || ''}</div>
-                <div>{info.billToAddress || ''}</div>
                 <div>{info.billToEmail || ''}</div>
+                <div>{info.billToAddress || ''}</div>
               </Col>
-              <Col md={4}>
-                <div className="fw-bold">Billed From:</div>
+              <Col md={6} className="text-md-end">
+                <div className="invoice-pdf-section-title">From:</div>
                 <div>{info.billFrom || ''}</div>
-                <div>{info.billFromAddress || ''}</div>
                 <div>{info.billFromEmail || ''}</div>
-              </Col>
-              <Col md={4}>
-                <div className="fw-bold mt-2">Date Of Issue:</div>
-                <div>{info.dateOfIssue || ''}</div>
+                <div>{info.billFromAddress || ''}</div>
               </Col>
             </Row>
-            <Table className="mb-0">
+            <div className="invoice-pdf-date">
+              <span>Date: {info.currentDate}</span>
+              {info.dueDate && <span>Due: {info.dueDate}</span>}
+              {info.gstin && <span>GSTIN: {info.gstin}</span>}
+              <span>Status: {info.status}</span>
+            </div>
+            <Table className="invoice-pdf-items">
               <thead>
                 <tr>
-                  <th>QTY</th>
                   <th>DESCRIPTION</th>
+                  <th className="text-center">QTY</th>
                   <th className="text-end">PRICE</th>
-                  <th className="text-end">AMOUNT</th>
+                  <th className="text-end">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item, i) => (
                   <tr key={i}>
-                    <td style={{width: '70px'}}>
-                      {item.quantity}
-                    </td>
-                    <td>
-                      {item.name} - {item.description}
-                    </td>
-                    <td className="text-end" style={{width: '100px'}}>
-                      {formatINR(item.price)}
-                    </td>
-                    <td className="text-end" style={{width: '100px'}}>
-                      {formatINR(item.price * item.quantity)}
-                    </td>
+                    <td>{item.name || 'Item'}</td>
+                    <td className="text-center">{item.quantity}</td>
+                    <td className="text-end">{formatINR(item.price)}</td>
+                    <td className="text-end">{formatINR(item.price * item.quantity)}</td>
                   </tr>
                 ))}
               </tbody>
             </Table>
-            <Table>
-              <tbody>
-                <tr>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                  <td>&nbsp;</td>
-                </tr>
-                <tr className="text-end">
-                  <td></td>
-                  <td className="fw-bold" style={{width: '100px'}}>SUBTOTAL</td>
-                  <td className="text-end" style={{width: '100px'}}>{currency} {subTotal}</td>
-                </tr>
-                {taxAmmount != 0.00 && (
-                  <tr className="text-end">
-                    <td></td>
-                    <td className="fw-bold" style={{width: '100px'}}>TAX</td>
-                    <td className="text-end" style={{width: '100px'}}>{currency} {taxAmmount}</td>
-                  </tr>
-                )}
-                {discountAmmount != 0.00 && (
-                  <tr className="text-end">
-                    <td></td>
-                    <td className="fw-bold" style={{width: '100px'}}>DISCOUNT</td>
-                    <td className="text-end" style={{width: '100px'}}>{currency} {discountAmmount}</td>
-                  </tr>
-                )}
-                <tr className="text-end">
-                  <td></td>
-                  <td className="fw-bold" style={{width: '100px'}}>TOTAL</td>
-                  <td className="text-end" style={{width: '100px'}}>{currency} {total}</td>
-                </tr>
-              </tbody>
-            </Table>
-            {info.notes && (
-              <div className="bg-light py-3 px-4 rounded">
-                {info.notes}
+            <div className="invoice-pdf-summary">
+              <div><span>SUBTOTAL</span><strong>{subTotal}</strong></div>
+              <div><span>TAX</span><strong>{taxAmmount}</strong></div>
+              <div><span>DISCOUNT</span><strong>{discountAmmount}</strong></div>
+              <div className="invoice-pdf-total"><span>TOTAL</span><strong>{total}</strong></div>
+            </div>
+            <div className="invoice-pdf-footer-grid">
+              <div>
+                <div className="invoice-pdf-section-title">Note:</div>
+                <div className="invoice-pdf-note">{info.notes || 'Thank you for your business.'}</div>
               </div>
-            )}
+              {info.showPaymentDetails && (
+                <div>
+                  <div className="invoice-pdf-section-title">Payment Information:</div>
+                  <div><strong>Business:</strong> {info.billFrom || 'Billix'}</div>
+                  <div><strong>Address:</strong> {info.billFromAddress || 'Contact the business for payment details.'}</div>
+                  {info.paymentTerms && <div><strong>Terms:</strong> {info.paymentTerms}</div>}
+                  {info.bankName && <div><strong>Bank:</strong> {info.bankName}</div>}
+                  {info.bankAccount && <div><strong>Account:</strong> {info.bankAccount}</div>}
+                  {info.upiId && <div><strong>UPI:</strong> {info.upiId}</div>}
+                  <div><strong>Email:</strong> {info.billFromEmail || 'Not provided'}</div>
+                </div>
+              )}
+            </div>
+            <div className="invoice-pdf-thank-you">Thank You!</div>
           </div>
         </div>
         <div className="pb-4 px-4">
           <Row>
-            <Col md={6}>
-              <Button variant="primary" className="d-block w-100" onClick={GenerateInvoice}>
+            <Col md={3}>
+              <Button variant="primary" className="d-block w-100" onClick={() => { onSaveInvoice(); GenerateInvoice(info) }}>
+                <BiSave 
+                  style={{width: '15px', height: '15px', marginTop: '-3px'}} 
+                  className="me-2"
+                />
+                Save & Download
+              </Button>
+            </Col>
+            <Col md={4}>
+              <Button variant="outline-primary" className="d-block w-100 mt-3 mt-md-0" onClick={onShareInvoice}>
+                <BiShareAlt 
+                  style={{width: '15px', height: '15px', marginTop: '-3px'}} 
+                  className="me-2"
+                />
+                Share Invoice
+              </Button>
+            </Col>
+            <Col md={4}>
+              <Button 
+                variant="outline-primary" 
+                className="d-block w-100 mt-3 mt-md-0" 
+                onClick={() => GenerateInvoice(info)}
+              >
                 <BiPaperPlane 
                   style={{width: '15px', height: '15px', marginTop: '-3px'}} 
                   className="me-2"
@@ -157,11 +155,11 @@ function InvoiceModal({
                 Send Invoice
               </Button>
             </Col>
-            <Col md={6}>
+            <Col md={4}>
               <Button 
                 variant="outline-primary" 
                 className="d-block w-100 mt-3 mt-md-0" 
-                onClick={GenerateInvoice}
+                onClick={() => GenerateInvoice(info)}
               >
                 <BiCloudDownload 
                   style={{width: '16px', height: '16px', marginTop: '-3px'}} 
