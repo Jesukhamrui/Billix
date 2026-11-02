@@ -1,2 +1,0 @@
-# invoice-generator-master
-
