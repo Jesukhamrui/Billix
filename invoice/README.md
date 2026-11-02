@@ -1,88 +1,106 @@
+# Billix
 
-# Invoice Generator 
-
-A modern, responsive invoice generator web application built with React and Vite. Easily create, review, and download professional invoices in PDF format. 
+Billix is a modern, responsive invoice studio built with React and Vite. Create professional invoices, review them before sending, save reusable business and customer details, and download a polished PDF directly from the browser.
 
 ## Features
-- Add, edit, and remove invoice items
-- Dynamic calculation of subtotal, tax, discount, and total
-- Customizable currency selection
-- Responsive UI using Bootstrap and React-Bootstrap
-- Download invoice as PDF (using html2canvas and jsPDF)
-- Modal preview before download
-- Notes and client/company details
 
-## Demo
-![Invoice Generator Screenshot](public/vite.svg)
+- Create invoices with an automatically tracked invoice number and current date
+- Add, edit, and remove line items with quantity and price controls
+- Calculate subtotal, tax, discount, and final total in real time
+- Add business and customer details, email addresses, physical addresses, GSTIN/tax ID, and invoice status
+- Set due dates and payment terms
+- Add bank account and UPI payment details
+- Upload a business logo and choose between Classic and Clean invoice templates
+- Show or hide payment details in the generated invoice
+- Save and reuse shop and customer profiles
+- Save invoices locally and reopen up to the 50 most recent invoices from invoice history
+- Start a new invoice without losing saved profiles or history
+- Preview the completed invoice in a modal before exporting it
+- Save and download invoices as PDF files
+- Share an invoice with the Web Share API, with a `mailto:` fallback when sharing is unavailable
+- Export saved profiles and invoice history to a JSON backup and import it later
+- Responsive layout for desktop and mobile screens
+
+## Tech Stack
+
+- [React 18](https://react.dev/) and [React DOM](https://react.dev/)
+- [Vite](https://vitejs.dev/) for development and production builds
+- [Bootstrap 5](https://getbootstrap.com/) and [React-Bootstrap](https://react-bootstrap.github.io/) for responsive UI components
+- [React Icons](https://react-icons.github.io/react-icons/) for interface icons
+- [html2canvas](https://html2canvas.hertzen.com/) and [jsPDF](https://github.com/parallax/jsPDF) for PDF generation
+- Browser `localStorage` for profiles, invoice history, and invoice numbering
+- Browser File APIs for logo uploads and JSON backup import/export
+- Web Share API with an email fallback for sharing invoices
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher recommended)
-- npm or yarn
+
+- Node.js 16 or newer
+- npm (or another compatible package manager)
 
 ### Installation
+
 ```bash
 npm install
 ```
 
-### Development
+### Start the development server
+
 ```bash
 npm run dev
 ```
-App will run at [http://localhost:3000](http://localhost:3000)
 
-### Build
+The app is available at [http://localhost:3000](http://localhost:3000).
+
+### Create a production build
+
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+### Preview the production build
+
 ```bash
 npm run preview
 ```
 
 ## Project Structure
-```
+
+```text
+invoice/
 ├── public/
-│   ├── manifest.json
-│   ├── vite.svg
+│   ├── logo192.png
+│   └── manifest.json
 ├── src/
-│   ├── App.jsx
-│   ├── App.css
-│   ├── main.jsx
-│   ├── index.css
 │   ├── assets/
-│   │   └── react.svg
-│   └── components/
-│       ├── EditableField.jsx
-│       ├── InvoiceForm.jsx
-│       ├── InvoiceItem.jsx
-│       └── InvoiceModal.jsx
+│   │   └── logo192.png
+│   ├── components/
+│   │   ├── EditableField.jsx
+│   │   ├── InvoiceForm.jsx
+│   │   ├── InvoiceItem.jsx
+│   │   └── InvoiceModal.jsx
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── eslint.config.js
 ├── index.html
 ├── package.json
+├── package-lock.json
 ├── vite.config.js
-├── eslint.config.js
 └── README.md
 ```
 
-## Technologies Used
-- [React](https://react.dev/) (v18)
-- [Vite](https://vitejs.dev/)
-- [Bootstrap](https://getbootstrap.com/) & [React-Bootstrap](https://react-bootstrap.github.io/)
-- [html2canvas](https://html2canvas.hertzen.com/)
-- [jsPDF](https://github.com/parallax/jsPDF)
-- [React Icons](https://react-icons.github.io/react-icons/)
+## Configuration and Data
 
-## Configuration
-- **Port:** Default development server runs on port 3000 (see `vite.config.js`)
-- **ESLint:** Configured for React best practices (`eslint.config.js`)
-
-## Manifest
-See `public/manifest.json` for PWA configuration.
+- Vite serves the development app on port `3000`; change `server.port` in `vite.config.js` to use another port.
+- The app does not require a backend or database. Profiles, saved invoices, and the next invoice number are stored in the browser's local storage.
+- Use the download and upload controls in the toolbar to move Billix data between browsers or devices with a `billix-backup.json` file.
+- Browser storage is device- and browser-specific. Export a backup before clearing site data or changing browsers.
 
 ## License
-MIT
 
----
-Created by Jesu (based on John Uberbacher's template)
+This project is released under the MIT License.
+
+Created by Jesu, 
